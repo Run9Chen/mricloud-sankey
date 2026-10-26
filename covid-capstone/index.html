@@ -3,24 +3,37 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Interactive historical COVID-19 case and death trends from archived JHU CSSE data.">
+  <meta name="description" content="Historical COVID-19 trends from JHU CSSE, ending March 2023.">
   <title>Global COVID-19 Explorer | Runjiu Chen</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/browser@1.11.0/build/stlite.css">
-  <script type="module" src="https://cdn.jsdelivr.net/npm/@stlite/browser@1.11.0/build/stlite.js"></script>
-  <style>
-    body{margin:0;background:#f6fafb;font-family:Arial,sans-serif}
-    .loading-note{padding:16px 24px;background:#e5f3f1;color:#265e62;font-size:14px}
-  </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/browser@1.12.0/build/stlite.css">
+  <style>body{margin:0;background:#f6fafb;font-family:Arial,sans-serif} #status{padding:16px 22px;background:#e4f3f0;color:#22626a;font-size:14px}</style>
 </head>
 <body>
-  <div class="loading-note">Loading the historical COVID-19 dashboard. The first visit may take a little longer because Python runs in your browser. Data end in March 2023.</div>
-  <streamlit-app src="./capstone.py">
-    <app-file name="data/time_series_covid19_confirmed_global.csv" url="https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"></app-file>
-    <app-file name="data/time_series_covid19_deaths_global.csv" url="https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv"></app-file>
-    <app-requirements>
-      pandas
-      plotly
-    </app-requirements>
-  </streamlit-app>
+  <div id="status">Loading the historical dashboard. Python and two JHU data files will download on first visit. Archive ends March 2023.</div>
+  <div id="root"></div>
+  <script type="module">
+    import { mount } from "https://cdn.jsdelivr.net/npm/@stlite/browser@1.12.0/build/stlite.js";
+    const base = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/";
+    const status = document.getElementById("status");
+    try {
+      const sourceResponse = await fetch("./capstone.py");
+      if (!sourceResponse.ok) throw new Error("Unable to download capstone.py: HTTP " + sourceResponse.status);
+      const code = await sourceResponse.text();
+      mount({
+        entrypoint: "capstone.py",
+        files: {
+          "capstone.py": code,
+          "data/time_series_covid19_confirmed_global.csv": {url: base + "time_series_covid19_confirmed_global.csv"},
+          "data/time_series_covid19_deaths_global.csv": {url: base + "time_series_covid19_deaths_global.csv"}
+        },
+        requirements: ["pandas", "plotly"],
+        streamlitConfig: {"client.toolbarMode": "viewer"}
+      }, document.getElementById("root"));
+      status.remove();
+    } catch (error) {
+      status.textContent = "Could not initialize the dashboard: " + error.message;
+      console.error(error);
+    }
+  </script>
 </body>
 </html>
