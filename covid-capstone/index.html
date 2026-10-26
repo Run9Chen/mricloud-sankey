@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Interactive historical COVID-19 case and death trends from archived JHU CSSE data.">
+  <title>Global COVID-19 Explorer | Runjiu Chen</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/browser@1.11.0/build/stlite.css">
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@stlite/browser@1.11.0/build/stlite.js"></script>
+  <style>
+    body{margin:0;background:#f6fafb;font-family:Arial,sans-serif}
+    .loading-note{padding:16px 24px;background:#e5f3f1;color:#265e62;font-size:14px}
+  </style>
+</head>
+<body>
+  <div class="loading-note">Loading the historical COVID-19 dashboard. The first visit may take a little longer because Python runs in your browser. Data end in March 2023.</div>
+  <streamlit-app src="./capstone.py">
+    <app-file name="data/time_series_covid19_confirmed_global.csv" url="https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"></app-file>
+    <app-file name="data/time_series_covid19_deaths_global.csv" url="https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv"></app-file>
+    <app-requirements>
+      pandas
+      plotly
+    </app-requirements>
+  </streamlit-app>
+</body>
+</html>
